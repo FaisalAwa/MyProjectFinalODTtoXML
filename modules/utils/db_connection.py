@@ -1,23 +1,30 @@
 import mysql.connector
 from mysql.connector import Error
+import streamlit as st
 
 def create_connection():
     """Create a connection to the MySQL database"""
     try:
+        # Fetch credentials from secrets.toml file
+        host = st.secrets["mysql"]["host"]
+        user = st.secrets["mysql"]["user"]
+        password = st.secrets["mysql"]["password"]
+        database = st.secrets["mysql"]["database"]
+
         connection = mysql.connector.connect(
-            host='localhost',
-            user='root',
-            password='fais914!',  
-            database='streamlit_app'
+            host=host,
+            user=user,
+            password=password,
+            database=database
         )
+        
         if connection.is_connected():
             return connection
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
 
-# ...existing code...
-
+# Verify admin credentials against the database
 def verify_admin(username, password):
     """
     Verify admin credentials against the database.
@@ -30,6 +37,9 @@ def verify_admin(username, password):
         bool: True if credentials are valid, False otherwise
     """
     conn = create_connection()
+    if conn is None:
+        return False
+
     try:
         cursor = conn.cursor()
         cursor.execute(
@@ -42,8 +52,10 @@ def verify_admin(username, password):
         print(f"Error verifying admin: {e}")
         return False
     finally:
-        conn.close()
+        if conn.is_connected():
+            conn.close()
 
+# Verify if the username and password match in the database
 def verify_user(username, password):
     """Verify if the username and password match in the database"""
     connection = create_connection()
@@ -64,6 +76,7 @@ def verify_user(username, password):
             cursor.close()
             connection.close()
 
+# Create a new user in the database
 def create_user(username, password):
     """Create a new user in the database
     Returns (success, message) tuple"""
@@ -91,7 +104,7 @@ def create_user(username, password):
             cursor.close()
             connection.close()
 
-# Add this after your existing functions
+# Log user activity in the database
 def log_user_activity(username, action, ip_address=None, user_agent=None):
     """
     Log user activity in the database
@@ -128,6 +141,7 @@ def log_user_activity(username, action, ip_address=None, user_agent=None):
             cursor.close()
             connection.close()
 
+# Get login statistics for users
 def get_user_login_stats(username=None, days=30):
     """
     Get login statistics for users
