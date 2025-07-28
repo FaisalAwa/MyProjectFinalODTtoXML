@@ -10,12 +10,16 @@ def create_connection():
         user = st.secrets["mysql"]["user"]
         password = st.secrets["mysql"]["password"]
         database = st.secrets["mysql"]["database"]
+        port = st.secrets["mysql"].get("port", 3306)  # Default to 3306 if not specified
 
         connection = mysql.connector.connect(
             host=host,
             user=user,
             password=password,
-            database=database
+            database=database,
+            port=port,
+            ssl_disabled=False,  # Enable SSL for cloud databases
+            autocommit=True
         )
         
         if connection.is_connected():
@@ -58,6 +62,7 @@ def verify_admin(username, password):
     finally:
         # Fixed: Check if conn is not None before closing
         if conn is not None and conn.is_connected():
+            cursor.close()
             conn.close()
 
 # Verify if the username and password match in the database
