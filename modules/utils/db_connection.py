@@ -20,6 +20,9 @@ def create_connection():
         
         if connection.is_connected():
             return connection
+        else:
+            print("Failed to connect to MySQL")
+            return None
     except Error as e:
         print(f"Error connecting to MySQL: {e}")
         return None
@@ -38,6 +41,7 @@ def verify_admin(username, password):
     """
     conn = create_connection()
     if conn is None:
+        print("Connection failed!")
         return False
 
     try:
@@ -52,7 +56,7 @@ def verify_admin(username, password):
         print(f"Error verifying admin: {e}")
         return False
     finally:
-        if conn.is_connected():
+        if conn is not None and conn.is_connected():
             conn.close()
 
 # Verify if the username and password match in the database
