@@ -31,7 +31,6 @@ env/
 # Credentials
 new.md
 
-Home.py
 
 utils/db_connection.py
 # IDE specific files
