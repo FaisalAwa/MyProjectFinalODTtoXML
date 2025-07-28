@@ -56,6 +56,7 @@ def verify_admin(username, password):
         print(f"Error verifying admin: {e}")
         return False
     finally:
+        # Fixed: Check if conn is not None before closing
         if conn is not None and conn.is_connected():
             conn.close()
 
@@ -76,7 +77,7 @@ def verify_user(username, password):
         print(f"Error: {e}")
         return False
     finally:
-        if connection.is_connected():
+        if connection is not None and connection.is_connected():
             cursor.close()
             connection.close()
 
@@ -104,7 +105,7 @@ def create_user(username, password):
     except Error as e:
         return False, str(e)
     finally:
-        if connection.is_connected():
+        if connection is not None and connection.is_connected():
             cursor.close()
             connection.close()
 
@@ -141,7 +142,7 @@ def log_user_activity(username, action, ip_address=None, user_agent=None):
         print(f"Error logging user activity: {e}")
         return False
     finally:
-        if connection.is_connected():
+        if connection is not None and connection.is_connected():
             cursor.close()
             connection.close()
 
@@ -192,6 +193,6 @@ def get_user_login_stats(username=None, days=30):
         print(f"Error getting login stats: {e}")
         return None
     finally:
-        if connection.is_connected():
+        if connection is not None and connection.is_connected():
             cursor.close()
             connection.close()
